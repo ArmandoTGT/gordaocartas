@@ -34,6 +34,62 @@ function App() {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const banners = [banner1, banner2, banner3];
 
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cart, setCart] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedCart = localStorage.getItem('gc-cart');
+      if (savedCart) return JSON.parse(savedCart);
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('gc-cart', JSON.stringify(cart));
+  }, [cart]);
+
+  const cartTotal = useMemo(() => cart.reduce((acc, item) => acc + (item.price * item.qty), 0), [cart]);
+  const cartCount = useMemo(() => cart.reduce((acc, item) => acc + item.qty, 0), [cart]);
+
+  const addToCart = (product) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.id === product.id);
+      if (existing) {
+        if (existing.qty >= product.stock) {
+          alert(`Limite máximo! Temos apenas ${product.stock} unidades em estoque.`);
+          return prev;
+        }
+        return prev.map(item => item.id === product.id ? { ...item, qty: item.qty + 1 } : item);
+      }
+      return [...prev, { ...product, qty: 1 }];
+    });
+    setIsCartOpen(true);
+    closeProductModal();
+  };
+
+  const updateCartQty = (productId, delta) => {
+    setCart(prev => prev.map(item => {
+      if (item.id === productId) {
+        const newQty = item.qty + delta;
+        if (newQty > 0 && newQty <= item.stock) return { ...item, qty: newQty };
+      }
+      return item;
+    }));
+  };
+
+  const removeFromCart = (productId) => setCart(prev => prev.filter(item => item.id !== productId));
+  const clearCart = () => setCart([]);
+
+  const handleCartWhatsAppCheckout = () => {
+    const phoneNumber = "5583998268170";
+    let message = `Olá, Gordão Cartas! Quero finalizar meu pedido:\n\n`;
+    cart.forEach(item => {
+      message += `▪️ ${item.qty}x ${item.name} - R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}\n`;
+    });
+    message += `\n*TOTAL:* R$ ${cartTotal.toFixed(2).replace('.', ',')}`;
+    message += `\n\nPor favor, me informem o frete e as opções de pagamento.`;
+    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
   useEffect(() => {
     if (currentView !== 'Home') return;
     
@@ -63,6 +119,7 @@ function App() {
       }
       setIsMobileMenuOpen(false);
       setIsFilterDropdownOpen(false);
+      setIsCartOpen(false);
       setVisibleCount(INITIAL_VISIBLE_COUNT);
     };
 
@@ -87,6 +144,7 @@ function App() {
     setSearchQuery(search);
     setIsMobileMenuOpen(false);
     setIsFilterDropdownOpen(false);
+    setIsCartOpen(false);
     setVisibleCount(INITIAL_VISIBLE_COUNT);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -219,6 +277,17 @@ function App() {
               </a>
             ))}
           </nav>
+          
+          {/* BOTÃO DO CARRINHO */}
+          <button onClick={() => setIsCartOpen(true)} className="relative text-white hover:text-tcg-primary transition-colors focus:outline-none p-1 block">
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-tcg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-tcg-background">
+                {cartCount}
+              </span>
+            )}
+          </button>
+
           <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white hover:text-tcg-primary transition-colors focus:outline-none p-1 block">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMobileMenuOpen ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
@@ -227,6 +296,70 @@ function App() {
         </div>
       </header>
 
+      {/* OVERLAY E DRAWER DO CARRINHO */}
+      <div className={`fixed inset-0 z-[60] flex justify-end transition-opacity duration-300 ${isCartOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsCartOpen(false)}></div>
+        <div className={`relative w-96 max-w-full bg-tcg-background border-l border-white/10 h-full shadow-2xl flex flex-col transition-transform duration-300 transform ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="flex justify-between items-center p-6 border-b border-white/5 bg-black/40">
+            <h2 className="text-xl font-black text-white flex items-center gap-2">
+              🛒 Meu Carrinho
+            </h2>
+            <button onClick={() => setIsCartOpen(false)} className="text-gray-400 hover:text-white">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {cart.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-gray-500 opacity-60">
+                <span className="text-4xl mb-4">🛒</span>
+                <p>Seu carrinho está vazio.</p>
+              </div>
+            ) : (
+              cart.map(item => (
+                <div key={item.id} className="flex gap-4 bg-white/5 border border-white/10 p-3 rounded-xl relative group">
+                  <img src={item.image} alt={item.name} className="w-16 h-20 object-cover rounded-md bg-gray-900 border border-white/10" />
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <h4 className="text-sm font-bold text-white line-clamp-1">{item.name}</h4>
+                      <p className="text-xs text-gray-400">{item.condition} {item.expansion ? `• ${item.expansion}` : ''}</p>
+                    </div>
+                    <div className="flex justify-between items-end">
+                      <span className="text-tcg-primary font-bold text-sm">R$ {item.price.toFixed(2).replace('.', ',')}</span>
+                      <div className="flex items-center bg-black/50 rounded-lg border border-white/10 overflow-hidden">
+                        <button onClick={() => updateCartQty(item.id, -1)} className="px-2 py-1 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">-</button>
+                        <span className="px-2 text-xs font-bold text-white w-6 text-center">{item.qty}</span>
+                        <button onClick={() => updateCartQty(item.id, 1)} className="px-2 py-1 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">+</button>
+                      </div>
+                    </div>
+                  </div>
+                  <button onClick={() => removeFromCart(item.id)} className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow-lg transition-colors">
+                    ✕
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+          {cart.length > 0 && (
+            <div className="p-6 bg-black/60 border-t border-white/10 backdrop-blur-md">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-400">Subtotal</span>
+                <span className="text-xl font-black text-white">R$ {cartTotal.toFixed(2).replace('.', ',')}</span>
+              </div>
+              <div className="flex justify-between items-center mb-6">
+                <button onClick={clearCart} className="text-xs text-gray-500 hover:text-red-400 underline transition-colors">Limpar Carrinho</button>
+                <span className="text-xs text-gray-500">Frete calculado no WhatsApp</span>
+              </div>
+              <button onClick={handleCartWhatsAppCheckout} className="w-full bg-tcg-primary hover:bg-tcg-glow shadow-neon text-white font-bold py-4 rounded-xl transition-all duration-300 transform hover:-translate-y-1 flex justify-center items-center gap-2">
+                Finalizar Pedido
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* OVERLAY DO MENU MOBILE EXISTENTE */}
       <div className={`fixed inset-0 z-40 flex justify-end transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
         <div className={`relative w-80 max-w-full bg-tcg-background border-l border-white/10 h-full shadow-2xl flex flex-col transition-transform duration-300 transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
@@ -592,9 +725,25 @@ function App() {
                   </div>
                 )}
               </div>
-              <button onClick={handleWhatsAppCheckout} className="mt-auto w-full bg-tcg-primary hover:bg-tcg-glow shadow-neon text-white font-bold py-5 rounded-2xl transition-all duration-300 transform hover:-translate-y-1 flex justify-center items-center gap-2 text-lg">
-                Continuar no WhatsApp
-              </button>
+              
+              {/* NOVOS BOTÕES NO MODAL (Carrinho x Compra Direta) */}
+              <div className="mt-auto flex flex-col gap-3">
+                <button 
+                  onClick={() => addToCart(selectedProduct)} 
+                  disabled={selectedProduct.stock === 0}
+                  className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-4 rounded-2xl transition-all duration-300 flex justify-center items-center gap-2 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  🛒 Adicionar ao Carrinho
+                </button>
+                <button 
+                  onClick={handleWhatsAppCheckout} 
+                  disabled={selectedProduct.stock === 0}
+                  className="w-full bg-tcg-primary hover:bg-tcg-glow shadow-neon text-white font-bold py-4 rounded-2xl transition-all duration-300 transform hover:-translate-y-1 flex justify-center items-center gap-2 text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  Comprar
+                </button>
+              </div>
+
             </div>
           </div>
         </div>
