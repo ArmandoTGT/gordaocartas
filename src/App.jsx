@@ -662,7 +662,7 @@ function App() {
               placeholder="Filtrar cartas pelo nome (a partir de 3 letras)..."
               value={cardNameFilter}
               onChange={(e) => { setCardNameFilter(e.target.value); setVisibleCount(INITIAL_VISIBLE_COUNT); }}
-              className="w-full md:max-w-md mb-8 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm font-medium text-white placeholder-gray-400 focus:outline-none focus:border-tcg-primary"
+              className="w-full md:max-w-md mb-8 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-base md:text-sm font-medium text-white placeholder-gray-400 focus:outline-none focus:border-tcg-primary"
             />
           )}
 
