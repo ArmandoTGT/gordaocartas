@@ -1,5 +1,18 @@
 [
   {
+    "id": "GC-55020915",
+    "name": "Psyduck",
+    "category": "Cartas Avulsas",
+    "game": "Pokemon",
+    "expansion": "ASC",
+    "condition": "NM",
+    "price": 1,
+    "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/ASC/ASC_039_R_PT_LG.png",
+    "featured": true,
+    "inStock": true,
+    "stock": 4
+  },
+  {
     "id": "GC-7CAF0035",
     "name": "Energia Borbulhante (Foil)",
     "category": "Cartas Avulsas",
@@ -99,7 +112,7 @@
     "condition": "NM",
     "price": 2,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/POR/POR_088_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 8
   },
@@ -138,7 +151,7 @@
     "condition": "NM",
     "price": 2,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/TWM/TWM_166_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 5
   },
@@ -229,7 +242,7 @@
     "condition": "NM",
     "price": 1,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/MEG/MEG_131_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 30
   },
@@ -255,7 +268,7 @@
     "condition": "NM",
     "price": 2,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/POR/POR_081_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 5
   },
@@ -437,7 +450,7 @@
     "condition": "NM",
     "price": 1,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/ASC/ASC_184_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 13
   },
@@ -1269,7 +1282,7 @@
     "condition": "NM",
     "price": 2,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/MEG/MEG_119_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 14
   },
@@ -1360,7 +1373,7 @@
     "condition": "NM",
     "price": 3,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/WHT/WHT_084_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 7
   },
@@ -2387,7 +2400,7 @@
     "condition": "NM",
     "price": 1,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/DRI/DRI_019_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 12
   },
@@ -2946,7 +2959,7 @@
     "condition": "NM",
     "price": 1,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/PFL/PFL_011_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 2
   },
@@ -3417,19 +3430,6 @@
     "featured": false,
     "inStock": true,
     "stock": 10
-  },
-  {
-    "id": "GC-55020915",
-    "name": "Psyduck",
-    "category": "Cartas Avulsas",
-    "game": "Pokemon",
-    "expansion": "ASC",
-    "condition": "NM",
-    "price": 1,
-    "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/ASC/ASC_039_R_PT_LG.png",
-    "featured": false,
-    "inStock": true,
-    "stock": 4
   },
   {
     "id": "GC-EFCB1896",
@@ -5221,7 +5221,7 @@
     "condition": "NM",
     "price": 1,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/ASC/ASC_126_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 2
   },
@@ -5468,7 +5468,7 @@
     "condition": "NM",
     "price": 1,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/POR/POR_050_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 1
   },
@@ -5715,7 +5715,7 @@
     "condition": "NM",
     "price": 2,
     "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/ASC/ASC_159_R_PT_LG.png",
-    "featured": false,
+    "featured": true,
     "inStock": true,
     "stock": 13
   },

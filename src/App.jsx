@@ -83,7 +83,7 @@ function App() {
     const phoneNumber = "5583998268170";
     let message = `Olá, Gordão Cartas! Quero finalizar meu pedido:\n\n`;
     cart.forEach(item => {
-      message += `▪️ ${item.qty}x ${item.name} - R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}\n`;
+      message += `▪️ ${item.qty}x ${item.name} R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}\n`;
     });
     message += `\n*TOTAL:* R$ ${cartTotal.toFixed(2).replace('.', ',')}`;
     message += `\n\nPor favor, me informem o frete e as opções de pagamento.`;
@@ -164,6 +164,17 @@ function App() {
     }
   };
 
+  // AJUSTE 1: Ouvinte para fechar o Modal com a tecla ESC
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeProductModal();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const filteredProducts = useMemo(() => {
     return productsData.filter(product => {
       const matchesCategory = activeCategory === 'Todos' || product.category === activeCategory;
@@ -173,15 +184,20 @@ function App() {
         (product.expansion && product.expansion.toLowerCase().includes(searchQuery.toLowerCase()));
       return matchesCategory && matchesSearch;
     });
-  }, [activeCategory, searchQuery, productsData]);
+  }, [activeCategory, searchQuery]);
 
   const visibleProducts = useMemo(() => {
     return filteredProducts.slice(0, visibleCount);
   }, [filteredProducts, visibleCount]);
 
-  const featuredProduct = useMemo(() => productsData.find(product => product.featured) || productsData[0], [productsData]);
-  const baseCarouselCards = useMemo(() => productsData.filter(product => product.category === 'Cartas Avulsas'), [productsData]);
+  const featuredProduct = useMemo(() => productsData.find(product => product.featured === true) || null, []);
+  
+  // AJUSTE 3: O Carrossel agora puxa APENAS cartas marcadas com 'featured === true'
+  const baseCarouselCards = useMemo(() => productsData.filter(product => product.featured === true), []);
+  // Multiplicamos por 4 para garantir o giro infinito limpo caso você tenha poucas cartas em destaque
   const carouselTrack = [...baseCarouselCards, ...baseCarouselCards, ...baseCarouselCards, ...baseCarouselCards];
+  
+  const carouselAnimationDuration = carouselTrack.length > 0 ? `${carouselTrack.length * 3}s` : '30s';
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -278,7 +294,6 @@ function App() {
             ))}
           </nav>
           
-          {/* BOTÃO DO CARRINHO */}
           <button onClick={() => setIsCartOpen(true)} className="relative text-white hover:text-tcg-primary transition-colors focus:outline-none p-1 block">
             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             {cartCount > 0 && (
@@ -296,7 +311,6 @@ function App() {
         </div>
       </header>
 
-      {/* OVERLAY E DRAWER DO CARRINHO */}
       <div className={`fixed inset-0 z-[60] flex justify-end transition-opacity duration-300 ${isCartOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsCartOpen(false)}></div>
         <div className={`relative w-96 max-w-full bg-tcg-background border-l border-white/10 h-full shadow-2xl flex flex-col transition-transform duration-300 transform ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}>
@@ -318,7 +332,7 @@ function App() {
             ) : (
               cart.map(item => (
                 <div key={item.id} className="flex gap-4 bg-white/5 border border-white/10 p-3 rounded-xl relative group">
-                  <img src={item.image} alt={item.name} className="w-16 h-20 object-cover rounded-md bg-gray-900 border border-white/10" />
+                  <img src={item.image} alt={item.name} className="w-14 aspect-[460/640] object-contain rounded-md bg-transparent" />
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <h4 className="text-sm font-bold text-white line-clamp-1">{item.name}</h4>
@@ -359,7 +373,6 @@ function App() {
         </div>
       </div>
 
-      {/* OVERLAY DO MENU MOBILE EXISTENTE */}
       <div className={`fixed inset-0 z-40 flex justify-end transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
         <div className={`relative w-80 max-w-full bg-tcg-background border-l border-white/10 h-full shadow-2xl flex flex-col transition-transform duration-300 transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
@@ -511,13 +524,14 @@ function App() {
               <div className="flex-1 w-full max-w-sm relative z-10 group mt-8 md:mt-0 hidden md:block">
                 <div className="absolute inset-0 bg-tcg-accent/20 blur-[50px] rounded-full group-hover:bg-tcg-accent/30 transition duration-500"></div>
                 <div className="relative bg-tcg-surface backdrop-blur-xl border border-white/10 p-5 rounded-2xl shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:shadow-card-hover hover:border-tcg-accent/40">
-                  <div className="w-full aspect-[4/5] bg-gray-900 rounded-xl mb-5 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 -translate-x-full group-hover:translate-x-full z-10 pointer-events-none"></div>
-                    <img src={featuredProduct.image} alt={featuredProduct.name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                  
+                  <div className="w-full aspect-[460/640] bg-transparent rounded-xl mb-5 relative overflow-hidden flex items-center justify-center cursor-pointer" onClick={() => openProductModal(featuredProduct)}>
+                    <img src={featuredProduct.image} alt={featuredProduct.name} loading="lazy" decoding="async" className="w-full h-full object-contain drop-shadow-2xl" />
                   </div>
+                  
                   <div className="flex justify-between items-start mb-4 gap-2">
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 cursor-pointer" onClick={() => openProductModal(featuredProduct)}>
                         <h3 className="text-xl font-bold text-white group-hover:text-purple-200 transition-colors leading-tight">{featuredProduct.name}</h3>
                         {featuredProduct.condition && (
                           <span className="bg-tcg-primary/20 text-tcg-primary border border-tcg-primary/30 text-[10px] font-bold px-1.5 py-0.5 rounded">
@@ -553,13 +567,17 @@ function App() {
               </div>
               
               <div className="flex w-full overflow-hidden group py-6">
-                <div className="flex animate-marquee group-hover:[animation-play-state:paused] min-w-max">
+                <div 
+                  className="flex animate-marquee group-hover:[animation-play-state:paused] min-w-max"
+                  style={{ animationDuration: carouselAnimationDuration }}
+                >
                   {carouselTrack.map((product, index) => (
                     <div key={`track1-${index}`} onClick={() => openProductModal(product)} className="w-48 shrink-0 mx-3 relative group/card cursor-pointer transition-transform duration-300 hover:scale-105">
-                      <div className="w-full aspect-[63/88] bg-gray-900 rounded-xl overflow-hidden border border-white/10 group-hover/card:border-tcg-primary/50 relative shadow-lg">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-all duration-500 -translate-x-full group-hover/card:translate-x-full z-10 pointer-events-none"></div>
-                        <img src={product.image} alt={product.name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                      
+                      <div className="w-full aspect-[460/640] bg-transparent rounded-xl overflow-hidden border border-transparent group-hover/card:border-tcg-primary/30 relative flex items-center justify-center transition-colors">
+                        <img src={product.image} alt={product.name} loading="lazy" decoding="async" className="w-full h-full object-contain drop-shadow-xl" />
                       </div>
+                      
                       <div className="mt-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           <h4 className="text-sm font-bold text-white truncate">{product.name}</h4>
@@ -571,13 +589,18 @@ function App() {
                   ))}
                 </div>
 
-                <div className="flex animate-marquee group-hover:[animation-play-state:paused] min-w-max" aria-hidden="true">
+                <div 
+                  className="flex animate-marquee group-hover:[animation-play-state:paused] min-w-max" 
+                  aria-hidden="true"
+                  style={{ animationDuration: carouselAnimationDuration }}
+                >
                   {carouselTrack.map((product, index) => (
                     <div key={`track2-${index}`} onClick={() => openProductModal(product)} className="w-48 shrink-0 mx-3 relative group/card cursor-pointer transition-transform duration-300 hover:scale-105">
-                      <div className="w-full aspect-[63/88] bg-gray-900 rounded-xl overflow-hidden border border-white/10 group-hover/card:border-tcg-primary/50 relative shadow-lg">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-all duration-500 -translate-x-full group-hover/card:translate-x-full z-10 pointer-events-none"></div>
-                        <img src={product.image} alt={product.name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                      
+                      <div className="w-full aspect-[460/640] bg-transparent rounded-xl overflow-hidden border border-transparent group-hover/card:border-tcg-primary/30 relative flex items-center justify-center transition-colors">
+                        <img src={product.image} alt={product.name} loading="lazy" decoding="async" className="w-full h-full object-contain drop-shadow-xl" />
                       </div>
+
                       <div className="mt-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           <h4 className="text-sm font-bold text-white truncate">{product.name}</h4>
@@ -642,13 +665,22 @@ function App() {
                 {visibleProducts.map((product) => (
                   <div key={product.id} className="relative group bg-tcg-surface backdrop-blur-xl border border-white/10 p-4 rounded-3xl transition-all duration-500 hover:-translate-y-2 hover:shadow-card-hover hover:border-tcg-accent/40 flex flex-col h-full">
                     <div className="absolute top-6 right-6 z-20 bg-tcg-background/90 backdrop-blur-sm border border-white/10 text-gray-300 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">{product.category}</div>
-                    <div className="w-full aspect-[4/5] bg-gray-900 rounded-xl mb-4 relative overflow-hidden group">
-                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 -translate-x-full group-hover:translate-x-full z-10 pointer-events-none"></div>
-                      <img src={product.image} alt={product.name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                    
+                    {/* AJUSTE 2: A imagem inteira do Catálogo agora é clicável e tem cursor-pointer */}
+                    <div 
+                      className="w-full aspect-[460/640] bg-transparent rounded-xl mb-4 relative overflow-hidden group flex items-center justify-center cursor-pointer"
+                      onClick={() => openProductModal(product)}
+                    >
+                      <img src={product.image} alt={product.name} loading="lazy" decoding="async" className="w-full h-full object-contain drop-shadow-xl" />
                     </div>
+
                     <div className="flex-grow flex flex-col justify-between">
                       <div>
-                        <div className="flex items-center gap-2 mb-1">
+                        {/* AJUSTE 2: O título também virou clicável */}
+                        <div 
+                          className="flex items-center gap-2 mb-1 cursor-pointer"
+                          onClick={() => openProductModal(product)}
+                        >
                           <h3 className="text-lg font-bold text-white group-hover:text-purple-200 transition-colors leading-tight">{product.name}</h3>
                           {product.condition && <span className="bg-tcg-primary/20 text-tcg-primary border border-tcg-primary/30 text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0">{product.condition}</span>}
                         </div>
@@ -679,13 +711,23 @@ function App() {
         </main>
       )}
 
+      {/* AJUSTE 1: Backdrop onClick={closeProductModal} */}
       {selectedProduct && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-tcg-surface border border-white/10 rounded-3xl max-w-2xl w-full p-6 md:p-8 relative shadow-2xl flex flex-col md:flex-row gap-8">
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={closeProductModal}
+        >
+          {/* Caixa do Modal com stopPropagation para não fechar quando clicar dentro dela */}
+          <div 
+            className="bg-tcg-surface border border-white/10 rounded-3xl max-w-2xl w-full p-6 md:p-8 relative shadow-2xl flex flex-col md:flex-row gap-8"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button onClick={closeProductModal} className="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-light leading-none transition-colors">&times;</button>
-            <div className="w-full md:w-1/3 aspect-[4/5] bg-gray-900 rounded-2xl overflow-hidden shrink-0 relative shadow-lg">
-               <img src={selectedProduct.image} alt={selectedProduct.name} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            
+            <div className="w-1/2 sm:w-2/5 md:w-1/3 mx-auto aspect-[460/640] bg-transparent rounded-2xl overflow-hidden shrink-0 relative flex items-center justify-center">
+               <img src={selectedProduct.image} alt={selectedProduct.name} loading="lazy" decoding="async" className="w-full h-full object-contain drop-shadow-2xl" />
             </div>
+
             <div className="flex-1 flex flex-col">
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -728,7 +770,6 @@ function App() {
                 )}
               </div>
               
-              {/* NOVOS BOTÕES NO MODAL (Carrinho x Compra Direta) */}
               <div className="mt-auto flex flex-col gap-3">
                 <button 
                   onClick={() => addToCart(selectedProduct)} 
