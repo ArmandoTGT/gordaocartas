@@ -1,0 +1,54 @@
+[
+  {
+    "id": "1",
+    "name": "Gengar VMAX",
+    "category": "Cartas Avulsas",
+    "game": "Pokémon TCG",
+    "expansion": "Fusion Strike",
+    "condition": "NM",
+    "price": 650.00,
+    "image": "https://placehold.co/400x560/1C0F2D/FF6B00?text=Gengar+VMAX",
+    "featured": true,
+    "inStock": true,
+    "stock": 2
+  },
+  {
+    "id": "2",
+    "name": "Elite Trainer Box - Escarlate e Violeta",
+    "category": "Decks & Selados",
+    "game": "Pokémon TCG",
+    "expansion": "Base Set",
+    "condition": "Novo/Lacrado",
+    "price": 350.00,
+    "image": "https://placehold.co/400x560/1C0F2D/FF6B00?text=ETB+Scarlet",
+    "featured": false,
+    "inStock": true,
+    "stock": 5
+  },
+  {
+    "id": "3",
+    "name": "Sleeves Dragon Shield Matte Black",
+    "category": "Acessórios",
+    "game": "Geral",
+    "expansion": null,
+    "condition": "Novo/Lacrado",
+    "price": 85.00,
+    "image": "https://placehold.co/400x560/1C0F2D/FF6B00?text=Dragon+Shield",
+    "featured": false,
+    "inStock": true,
+    "stock": 12
+  },
+  {
+    "id": "4",
+    "name": "Charizard ex",
+    "category": "Cartas Avulsas",
+    "game": "Pokémon TCG",
+    "expansion": "Obsidian Flames",
+    "condition": "NM",
+    "price": 180.00,
+    "image": "https://placehold.co/400x560/1C0F2D/FF6B00?text=Charizard+ex",
+    "featured": false,
+    "inStock": true,
+    "stock": 3
+  }
+]
