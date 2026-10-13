@@ -706,6 +706,8 @@ function App() {
                 <ul className="text-xs text-gray-400 space-y-2 list-disc list-inside">
                   <li>Envios via Correios (frete por conta do comprador).</li>
                   <li>Entrega pessoalmente apenas mediante combinação prévia.</li>
+                  <li>Sempre verifique a versão do produto que você está tentando comprar.</li>
+                  <li>Consulte no contato a disponibilidade real do produto.</li>
                 </ul>
               </div>
 
