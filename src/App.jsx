@@ -86,7 +86,7 @@ function App() {
       message += `▪️ ${item.qty}x ${item.name} R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}\n`;
     });
     message += `\n*TOTAL:* R$ ${cartTotal.toFixed(2).replace('.', ',')}`;
-    message += `\n\nPor favor, me informem o frete e as opções de pagamento.`;
+    message += `\n\nPor favor, me informe as opções de pagamento e de entrega.`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -164,7 +164,6 @@ function App() {
     }
   };
 
-  // AJUSTE 1: Ouvinte para fechar o Modal com a tecla ESC
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
@@ -192,12 +191,10 @@ function App() {
 
   const featuredProduct = useMemo(() => productsData.find(product => product.featured === true) || null, []);
   
-  // AJUSTE 3: O Carrossel agora puxa APENAS cartas marcadas com 'featured === true'
   const baseCarouselCards = useMemo(() => productsData.filter(product => product.featured === true), []);
-  // Multiplicamos por 4 para garantir o giro infinito limpo caso você tenha poucas cartas em destaque
   const carouselTrack = [...baseCarouselCards, ...baseCarouselCards, ...baseCarouselCards, ...baseCarouselCards];
   
-  const carouselAnimationDuration = carouselTrack.length > 0 ? `${carouselTrack.length * 3}s` : '30s';
+  const carouselAnimationDuration = carouselTrack.length > 0 ? `${carouselTrack.length * 15}s` : '150s';
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -661,14 +658,16 @@ function App() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
                 {visibleProducts.map((product) => (
-                  <div key={product.id} className="relative group bg-tcg-surface backdrop-blur-xl border border-white/10 p-4 rounded-3xl transition-all duration-500 hover:-translate-y-2 hover:shadow-card-hover hover:border-tcg-accent/40 flex flex-col h-full">
-                    <div className="absolute top-6 right-6 z-20 bg-tcg-background/90 backdrop-blur-sm border border-white/10 text-gray-300 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">{product.category}</div>
+                  <div key={product.id} className="relative group bg-tcg-surface backdrop-blur-xl border border-white/10 p-3 sm:p-4 rounded-2xl sm:rounded-3xl transition-all duration-500 hover:-translate-y-2 hover:shadow-card-hover hover:border-tcg-accent/40 flex flex-col h-full">
                     
-                    {/* AJUSTE 2: A imagem inteira do Catálogo agora é clicável e tem cursor-pointer */}
+                    {/* Badge da Categoria - Menor no mobile */}
+                    <div className="absolute top-3 right-3 sm:top-6 sm:right-6 z-20 bg-tcg-background/90 backdrop-blur-sm border border-white/10 text-gray-300 text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 rounded uppercase tracking-wider">{product.category}</div>
+                    
+                    {/* Imagem */}
                     <div 
-                      className="w-full aspect-[460/640] bg-transparent rounded-xl mb-4 relative overflow-hidden group flex items-center justify-center cursor-pointer"
+                      className="w-full aspect-[460/640] bg-transparent rounded-lg sm:rounded-xl mb-3 sm:mb-4 relative overflow-hidden group flex items-center justify-center cursor-pointer"
                       onClick={() => openProductModal(product)}
                     >
                       <img src={product.image} alt={product.name} loading="lazy" decoding="async" className="w-full h-full object-contain drop-shadow-xl" />
@@ -676,20 +675,22 @@ function App() {
 
                     <div className="flex-grow flex flex-col justify-between">
                       <div>
-                        {/* AJUSTE 2: O título também virou clicável */}
+                        {/* Título e Condição - Empilhados no mobile para não cortar o texto */}
                         <div 
-                          className="flex items-center gap-2 mb-1 cursor-pointer"
+                          className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 mb-1.5 sm:mb-1 cursor-pointer"
                           onClick={() => openProductModal(product)}
                         >
-                          <h3 className="text-lg font-bold text-white group-hover:text-purple-200 transition-colors leading-tight">{product.name}</h3>
-                          {product.condition && <span className="bg-tcg-primary/20 text-tcg-primary border border-tcg-primary/30 text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0">{product.condition}</span>}
+                          <h3 className="text-sm sm:text-lg font-bold text-white group-hover:text-purple-200 transition-colors leading-tight">{product.name}</h3>
+                          {product.condition && <span className="bg-tcg-primary/20 text-tcg-primary border border-tcg-primary/30 text-[8px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded shrink-0">{product.condition}</span>}
                         </div>
-                        <p className="text-xs text-gray-400 mb-2">{product.game} {product.expansion && `• ${product.expansion}`}</p>
-                        <p className="text-[11px] text-gray-400 mb-3">Estoque: <strong className="text-gray-200">{product.stock} un.</strong></p>
+                        <p className="text-[10px] sm:text-xs text-gray-400 mb-1.5 sm:mb-2 truncate">{product.game} {product.expansion && `• ${product.expansion}`}</p>
+                        <p className="text-[9px] sm:text-[11px] text-gray-400 mb-2 sm:mb-3">Estoque: <strong className="text-gray-200">{product.stock} un.</strong></p>
                       </div>
-                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-                        <span className="text-xl font-black text-tcg-primary">R$ {product.price.toFixed(2).replace('.', ',')}</span>
-                        <button onClick={() => openProductModal(product)} className="bg-white/5 hover:bg-tcg-primary hover:text-white border border-white/10 hover:border-tcg-primary text-gray-300 font-medium py-2 px-4 rounded-xl transition-all duration-300 text-sm">Comprar</button>
+                      
+                      {/* Preço e Botão Comprar - Botão estica no mobile para facilitar o clique */}
+                      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between mt-auto pt-3 sm:pt-4 border-t border-white/5 gap-2 sm:gap-0">
+                        <span className="text-base sm:text-xl font-black text-tcg-primary">R$ {product.price.toFixed(2).replace('.', ',')}</span>
+                        <button onClick={() => openProductModal(product)} className="w-full xl:w-auto bg-white/5 hover:bg-tcg-primary hover:text-white border border-white/10 hover:border-tcg-primary text-gray-300 font-medium py-1.5 px-3 sm:py-2 sm:px-4 rounded-lg sm:rounded-xl transition-all duration-300 text-xs sm:text-sm">Comprar</button>
                       </div>
                     </div>
                   </div>
@@ -711,7 +712,7 @@ function App() {
         </main>
       )}
 
-      {/* AJUSTE 1: Backdrop onClick={closeProductModal} */}
+      {/* Backdrop onClick={closeProductModal} */}
       {selectedProduct && (
         <div 
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
